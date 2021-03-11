@@ -1,21 +1,35 @@
 const Todo = require('../models/Todo');
-
-exports.createTodo = (req, res) => {
+const User = require('../models/User');
+exports.createTodo = async (req, res) => {
   try {
-    Todo.create(
-      {
-        text: req.body.text,
-        date: req.body.date,
-      },
-      function (err, todo) {
-        if (err) {
-          console.log(err);
-          return res.status(400).json({ message: 'Error in creating Todo' });
-        }
+    const id = req.params.userId;
+    console.log(id)
+    const todo = await Todo.create({
+      text: req.body.text,
+      date: req.body.date,
+    });
+    await todo.save();
+    const user =await User.findById(id);
+    console.log(user)
+    user.todos.push(todo);
+    await user.save();
+    return res.status(200).json({ todo: todo, message: 'Todo Created' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
-        return res.status(200).json({ todo: todo, message: 'Todo created' });
+exports.getTodobyUserID = async (req, res) => {
+  try {
+    let id = req.params.userId;
+    console.log(id);
+    await User.findById(id).populate('todos').exec((err,user) => {
+      if(err) {
+        console.log('err')
+        return res.status(400).json({ message: 'Cannot Find User'})
       }
-    );
+      return res.status(200).json(user.todos)
+    });
   } catch (err) {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -31,24 +45,7 @@ exports.getTodos = (req, res) => {
       return res.status(200).json({ todos: todos, message: 'All Todos' });
     });
   } catch (err) {
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-exports.getTodobyID = (req, res) => {
-  try {
-    let id = req.params.id;
-    Todo.findById(id, function (err, todo) {
-      if (err) {
-        console.log(err);
-        return res.status(400).json({ message: 'Error in getting Todo' });
-      }
-      if (!todo) {
-        return res.status(404).json({ message: 'Todo not found in DB' });
-      }
-      return res.status(200).json({ todo: todo });
-    });
-  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
@@ -93,6 +90,6 @@ exports.updateTodos = (req, res) => {
       }
     );
   } catch (err) {
-    return res.status(500).json({ message: 'Internal Server Error' }); 
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

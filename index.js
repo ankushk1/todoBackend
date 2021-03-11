@@ -6,13 +6,13 @@ const todoRoutes=require('./routes/todoRoutes')
 const userRoutes=require('./routes/userRoutes')
 const passport =require('./config/passportJwt')
 const jwt= require('jsonwebtoken')
-
+const cors = require('cors')
 
 app.use(express.urlencoded())
 app.use(express.json())
-
+app.use(cors())
 app.use('/user',userRoutes)
-app.use("/",passport.authenticate("jwt",{session: false}), todoRoutes);
+app.use("/", passport.authenticate('jwt', { session: false }), todoRoutes);
 
 
 app.listen(port, ()=>{

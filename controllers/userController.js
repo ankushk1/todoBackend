@@ -10,8 +10,8 @@ exports.signup = async function (req, res) {
     const errors = validationResult( req )
     console.log(errors)
     if(!errors.isEmpty()){
-      return res.status(404).json({
-        error: errors.array()[0].msg
+      return res.status(400).json({
+        message: errors.array()[0].msg
       })
     }
     let user = await User.findOne({
@@ -19,7 +19,7 @@ exports.signup = async function (req, res) {
     });
 
     if (user) {
-      return res.status(404).json({ message: 'User exists' });
+      return res.status(400).json({ message: 'User exists' });
     }
 
     User.create(
@@ -32,11 +32,12 @@ exports.signup = async function (req, res) {
       function (err, user) {
         if (err) {
           console.log(err);
-          res.status(404).json({ message: 'Error creating user' });
+          res.status(400).json({ message: 'Error creating user' });
         }
         // console.log(user);
         const { _id, firstname, lastname, email } = user;
-
+        console.log(user);
+        
         return res.status(200).json({
           user: { _id, firstname, lastname, email },
           message: 'User Created',
@@ -53,11 +54,13 @@ exports.login = async function (req, res) {
 
     const errors = validationResult( req )
     console.log(errors)
+
     if(!errors.isEmpty()){
-      return res.status(404).json({
-        error: errors.array()[0].msg
+      return res.status(400).json({
+        message: errors.array()[0].msg
       })
     }
+    
     let user = await User.findOne({
       email: req.body.email,
     });
