@@ -15,6 +15,6 @@ app.use('/user',userRoutes)
 app.use("/", passport.authenticate('jwt', { session: false }), todoRoutes);
 
 
-app.listen(port, ()=>{
+app.listen(port, (req,res)=>{
     console.log(`The server is running on port: ${port}`);
 })
