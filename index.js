@@ -12,9 +12,17 @@ app.use(express.urlencoded())
 app.use(express.json())
 app.use(cors())
 app.use('/user',userRoutes)
-app.use("/", passport.authenticate('jwt', { session: false }), todoRoutes);
+app.use("/todo", passport.authenticate('jwt', { session: false }), todoRoutes);
 
-
+app.use('/', function(req, res, next){ 
+    res.send('heroku runnig'); 
+    next(); 
+ }); 
+   
+ app.get('/', function(req, res){ 
+     console.log("Body Sent") 
+ }); 
+   
 app.listen(port, (req,res)=>{
     console.log(`The server is running on port: ${port}`);
 })
